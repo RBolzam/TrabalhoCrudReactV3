@@ -1,0 +1,49 @@
+// Configuração do gerador do cliente Prisma
+generator client {
+  // Especifica que o cliente será gerado para JavaScript/TypeScript
+  provider = "prisma-client-js"
+}
+
+// Configuração da fonte de dados (banco de dados)
+datasource db {
+  // Usa SQLite como banco de dados
+  provider = "sqlite"
+  // Caminho para o arquivo do banco de dados SQLite
+  url      = "file:./dev.db"
+}
+
+// Modelo para representar tarefas
+model Task {
+  id          Int      @id @default(autoincrement()) // Chave primária com autoincremento
+  title       String   // Título obrigatório da tarefa
+  description String?  // Descrição opcional
+  completed   Boolean  @default(false) // Status de conclusão (padrão: false)
+  createdAt   DateTime @default(now()) // Data de criação automática
+  userId      Int      // ID do usuário associado (chave estrangeira)
+
+  // Relação com o modelo User (N:1)
+  user        User     @relation(fields: [userId], references: [id])
+}
+
+// Modelo para representar usuários
+model User {
+  id        Int      @id @default(autoincrement()) // Chave primária com autoincremento
+  email     String   @unique // Email único para cada usuário
+  password  String   // Senha do usuário
+  createdAt DateTime @default(now()) // Data de criação automática
+  
+  // Relações com outros modelos:
+  tasks     Task[]   // Lista de tarefas do usuário (1:N)
+  Todo      Todo[]   // Lista de todos do usuário (1:N)
+}
+
+// Modelo para representar itens TODO
+model Todo {
+  id     Int     @id @default(autoincrement()) // Chave primária com autoincremento
+  title  String  // Título obrigatório
+  done   Boolean @default(false) // Status de conclusão (padrão: false)
+  userId Int     // ID do usuário associado (chave estrangeira)
+
+  // Relação com o modelo User (N:1)
+  user   User    @relation(fields: [userId], references: [id])
+}
